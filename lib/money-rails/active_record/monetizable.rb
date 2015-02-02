@@ -234,6 +234,22 @@ module MoneyRails
             after_save do
               instance_variable_set "@#{name}_money_before_type_cast", nil
             end
+
+
+            if instance_currency_name.present?
+              # If the instance currency is set after the amount is set,
+              # we need to parse the amount again.
+              define_method "#{instance_currency_name}=" do |value|
+                money = instance_variable_get "@#{name}_money_before_type_cast"
+                previous = self[instance_currency_name]
+
+                self[instance_currency_name] = value
+
+                if money && previous != value
+                  send("#{name}=", money)
+                end
+              end
+            end
           end
         end
 

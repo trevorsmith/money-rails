@@ -460,6 +460,15 @@ if defined? ActiveRecord
         expect(service.discount.currency_as_string).to eq("EUR")
       end
 
+      it "resets field to money_before_type_cast if the model currency is changed" do
+        product.sale_price = "100"
+        expect(product.sale_price.cents).to eq(10000)
+
+        product.sale_price_currency_code = "JPY"
+        expect(product.sale_price.cents).to eq(100)
+        expect(product.sale_price.currency_as_string).to eq("JPY")
+      end
+
       it "sets field to nil, in nil assignments if allow_nil is set" do
         product.optional_price = nil
         expect(product.save).to be_truthy
